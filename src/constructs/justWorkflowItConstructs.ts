@@ -135,7 +135,7 @@ export class JustWorkflowItConstructs extends Construct {
         exclude: ['*.ts', '*.d.ts'],
       }),
       handler: 'definitionDeployerLambda.handler',
-      runtime: Runtime.NODEJS_20_X,
+      runtime: Runtime.NODEJS_24_X,
       timeout: Duration.minutes(5),
       environment: {
         AUTH_SECRET_NAME: secretName,
