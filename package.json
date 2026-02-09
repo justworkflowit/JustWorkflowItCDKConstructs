@@ -4,7 +4,7 @@
   "version": "0.0.313",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JustWorkflowIt/JustWorkflowItCDKConstructs"
+    "url": "https://github.com/justworkflowit/JustWorkflowItCDKConstructs"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
