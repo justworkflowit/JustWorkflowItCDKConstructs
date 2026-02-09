@@ -3,10 +3,10 @@ name: Publish Package
 on:
   workflow_dispatch:
 
-# Required for npm provenance (OIDC trusted publishing)
+# Required for npm OIDC trusted publishing + provenance
 permissions:
-  contents: write  # For pushing version bump + tags
-  id-token: write  # For npm OIDC provenance
+  contents: write  # For pushing tags
+  id-token: write  # For npm OIDC authentication and provenance
 
 jobs:
   publish:
@@ -94,32 +94,22 @@ jobs:
             fi
           done
 
-          # Update package.json
+          # Update package.json in working directory (for npm publish)
           jq --arg v "$NEW_VERSION" '.version = $v' package.json > package.json.tmp
           mv package.json.tmp package.json
 
-          # Publish with provenance
+          # Publish with provenance (OIDC trusted publishing - no NPM_TOKEN needed)
           echo "Publishing $NAME@$NEW_VERSION with provenance..."
           npm publish --access public --provenance
 
           echo "Published $NAME@$NEW_VERSION"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Commit version bump and update tag
+      - name: Update last-publish tag
         if: steps.detect.outputs.should_publish == 'true'
         run: |
-          git config --global user.name "JustWorkflowIt CI"
-          git config --global user.email "ci@justworkflowit.com"
-
-          # Commit version bump
-          git add package.json
-          git commit -m "Release bump [skip ci]" || echo "No changes to commit"
-
-          # Push to main
-          git push origin HEAD:refs/heads/main || echo "Push failed (may need rebase)"
-
-          # Update the last-publish tag
+          # Only update the tag - do NOT push version bump commits
+          # Pushing commits would trigger the pipeline webhook, creating a cycle
+          # The npm registry is the source of truth for the published version
           git tag -f last-publish
           git push origin last-publish --force
 
