@@ -29,7 +29,7 @@
     "@aws-sdk/client-s3": "^3.842.0",
     "@aws-sdk/client-secrets-manager": "^3.985.0",
     "@justworkflowit/api-client": "*",
-    "@justworkflowit/engine": "^0.0.76",
+    "@justworkflowit/engine": "*",
     "@smithy/types": "^4.0.0",
     "aws-cdk-lib": "^2.0.0",
     "constructs": "^10.0.0",
@@ -59,7 +59,7 @@
   },
   "peerDependencies": {
     "@justworkflowit/api-client": "*",
-    "@justworkflowit/engine": "^0.0.76",
+    "@justworkflowit/engine": "*",
     "aws-cdk-lib": "^2.0.0",
     "constructs": "^10.0.0"
   }
