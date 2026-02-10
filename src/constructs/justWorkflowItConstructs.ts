@@ -76,8 +76,11 @@ export class JustWorkflowItConstructs extends Construct {
           );
 
           // Configure json-schema-faker to always generate optional fields for thorough validation
+          // Note: requiredOnly must be explicitly reset because the engine's two-pass validation
+          // sets it to true globally during its second pass, which persists across definitions
           JSONSchemaFaker.option({
             alwaysFakeOptionals: true,
+            requiredOnly: false,
           });
 
           fakeWorkflowInputForTypeValidation = JSONSchemaFaker.generate(
