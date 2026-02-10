@@ -337,7 +337,7 @@ describe('JustWorkflowItConstructs', () => {
               $ref: '#/definitions/metadataType',
             },
           },
-          required: ['businessId'],
+          required: ['businessId', 'metadata'],
           additionalProperties: false,
         },
         metadataType: {
