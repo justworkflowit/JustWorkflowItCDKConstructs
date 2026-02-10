@@ -164,7 +164,9 @@ async function deployWorkflows(
       console.log(`✅ Registered and tagged new $LIVE version for: ${workflowName}`);
     } catch (err) {
       console.error(`❌ Error processing ${key}`, err);
-      throw err;
+      // Truncate error message to prevent CloudFormation "Response object is too long" failures
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(msg.length > 1000 ? `${msg.slice(0, 1000)}... (truncated)` : msg);
     }
   }
 }
