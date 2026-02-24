@@ -391,6 +391,69 @@ describe('JustWorkflowItConstructs', () => {
     }).not.toThrow();
   });
 
+  test('should accept workflow with marketplace step (placeholders auto-injected)', () => {
+    const app = new App();
+    const stack = new Stack(app, 'TestStack');
+
+    const workflowWithMarketplaceStep = JSON.stringify({
+      workflowName: 'marketplaceConsumerWorkflow',
+      steps: [
+        {
+          name: 'fetchData',
+          retries: 2,
+          timeoutSeconds: 1000,
+          transitionToStep: 'processMarketplace',
+          integrationDetails: {
+            type: 'testIntegration',
+            inputDefinition: {
+              $ref: '#/definitions/fetchDataInput',
+            },
+            outputDefinition: {
+              $ref: '#/definitions/fetchDataOutput',
+            },
+          },
+        },
+        {
+          name: 'processMarketplace',
+          retries: 2,
+          timeoutSeconds: 1000,
+          transitionToStep: null,
+          integrationDetails: {
+            type: '/justworkflowit/runMarketplaceJob',
+            config: {
+              publisherOrgKey: 'some-publisher',
+              listingKey: 'some-listing',
+              versionNumber: 1,
+            },
+          },
+        },
+      ],
+      definitions: {
+        fetchDataInput: {
+          type: 'object',
+          properties: {},
+          additionalProperties: false,
+        },
+        fetchDataOutput: {
+          type: 'object',
+          properties: {
+            result: { type: 'string' },
+          },
+          required: ['result'],
+          additionalProperties: false,
+        },
+      },
+    });
+
+    expect(() => {
+      new JustWorkflowItConstructs(stack, {
+        disambiguator: 'test',
+        organizationId: 'org123',
+        workflowDefinitions: [workflowWithMarketplaceStep],
+      });
+    }).not.toThrow();
+  });
+
   test('should accept workflow without workflowInput definition (backward compatibility)', () => {
     const app = new App();
     const stack = new Stack(app, 'TestStack');

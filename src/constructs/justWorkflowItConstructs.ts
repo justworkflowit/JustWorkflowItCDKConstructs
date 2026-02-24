@@ -53,6 +53,19 @@ export class JustWorkflowItConstructs extends Construct {
             if (step?.integrationDetails?.type) {
               integrationTypes.add(step.integrationDetails.type);
             }
+
+            // For marketplace steps, inject permissive placeholder schemas so synth-time
+            // validation passes. The real schemas are injected at API registration time.
+            if (step?.integrationDetails?.type === '/justworkflowit/runMarketplaceJob' && step.name) {
+              const stepName = step.name as string;
+              if (!parsedWorkflow.definitions) {
+                parsedWorkflow.definitions = {};
+              }
+              parsedWorkflow.definitions[`${stepName}Input`] = { type: 'object', additionalProperties: true };
+              parsedWorkflow.definitions[`${stepName}Output`] = { type: 'object', additionalProperties: true };
+              step.integrationDetails.inputDefinition = { $ref: `#/definitions/${stepName}Input` };
+              step.integrationDetails.outputDefinition = { $ref: `#/definitions/${stepName}Output` };
+            }
           });
         }
 
@@ -61,6 +74,9 @@ export class JustWorkflowItConstructs extends Construct {
           type,
           execute: async () => ({ status: 'success' as const, payload: {} }),
         }));
+
+        // Use the modified definition (with marketplace placeholders) for engine validation
+        const definitionForValidation = JSON.stringify(parsedWorkflow);
 
         // Generate fake workflow input if a workflowInput definition exists
         let fakeWorkflowInputForTypeValidation = undefined;
@@ -91,7 +107,7 @@ export class JustWorkflowItConstructs extends Construct {
 
         // This will throw if the workflow definition is invalid
         new JustWorkflowItEngine({
-          workflowDefinition: definition,
+          workflowDefinition: definitionForValidation,
           stepExecutors: dummyExecutors,
           workflowInput: fakeWorkflowInputForTypeValidation,
         });
