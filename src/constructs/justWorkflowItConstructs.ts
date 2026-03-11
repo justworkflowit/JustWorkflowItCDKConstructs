@@ -54,9 +54,11 @@ export class JustWorkflowItConstructs extends Construct {
               integrationTypes.add(step.integrationDetails.type);
             }
 
-            // For marketplace steps, inject permissive placeholder schemas so synth-time
+            // For marketplace and runChildJob steps, inject permissive placeholder schemas so synth-time
             // validation passes. The real schemas are injected at API registration time.
-            if (step?.integrationDetails?.type === '/justworkflowit/runMarketplaceJob' && step.name) {
+            const needsPlaceholderSchemas = step?.integrationDetails?.type === '/justworkflowit/runMarketplaceJob'
+              || step?.integrationDetails?.type === '/justworkflowit/runChildJob';
+            if (needsPlaceholderSchemas && step.name) {
               const stepName = step.name as string;
               if (!parsedWorkflow.definitions) {
                 parsedWorkflow.definitions = {};
