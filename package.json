@@ -19,7 +19,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "resource-contract.json"
   ],
   "keywords": [],
   "author": "",
@@ -29,7 +30,7 @@
     "@aws-sdk/client-s3": "^3.842.0",
     "@aws-sdk/client-secrets-manager": "^3.985.0",
     "@justworkflowit/api-client": "*",
-    "@justworkflowit/engine": "^0.0.81",
+    "@justworkflowit/engine": "^0.0.82",
     "@smithy/types": "^4.0.0",
     "aws-cdk-lib": "^2.0.0",
     "constructs": "^10.0.0",

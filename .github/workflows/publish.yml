@@ -115,6 +115,30 @@ jobs:
 
           echo "Updated last-publish tag"
 
+      - name: Notify Terraform repos of contract update
+        if: steps.detect.outputs.should_publish == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const repos = [
+              'JustWorkflowItAwsTerraform',
+              'JustWorkflowItGcsTerraform'
+            ];
+            for (const repo of repos) {
+              try {
+                await github.rest.repos.createDispatchEvent({
+                  owner: 'justworkflowit',
+                  repo,
+                  event_type: 'contract-updated',
+                  client_payload: { source: 'cdk-constructs-publish' }
+                });
+                console.log(`Dispatched contract-updated to ${repo}`);
+              } catch (err) {
+                console.warn(`Failed to dispatch to ${repo}: ${err.message}`);
+              }
+            }
+
       - name: Skip publish (no changes)
         if: steps.detect.outputs.should_publish != 'true'
         run: echo "No changes since last publish. Skipping."
