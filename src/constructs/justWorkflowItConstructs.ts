@@ -63,10 +63,17 @@ export class JustWorkflowItConstructs extends Construct {
               if (!parsedWorkflow.definitions) {
                 parsedWorkflow.definitions = {};
               }
-              parsedWorkflow.definitions[`${stepName}Input`] = { type: 'object', additionalProperties: true };
-              parsedWorkflow.definitions[`${stepName}Output`] = { type: 'object', additionalProperties: true };
-              step.integrationDetails.inputDefinition = { $ref: `#/definitions/${stepName}Input` };
-              step.integrationDetails.outputDefinition = { $ref: `#/definitions/${stepName}Output` };
+              // Only override with permissive placeholders when no definition is provided.
+              // When the workflow supplies its own input/output definitions (e.g. to describe
+              // the marketplace executor's output shape), preserve them so mock data matches.
+              if (!step.integrationDetails.inputDefinition) {
+                parsedWorkflow.definitions[`${stepName}Input`] = { type: 'object', additionalProperties: true };
+                step.integrationDetails.inputDefinition = { $ref: `#/definitions/${stepName}Input` };
+              }
+              if (!step.integrationDetails.outputDefinition) {
+                parsedWorkflow.definitions[`${stepName}Output`] = { type: 'object', additionalProperties: true };
+                step.integrationDetails.outputDefinition = { $ref: `#/definitions/${stepName}Output` };
+              }
             }
           });
         }
